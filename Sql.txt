@@ -1,0 +1,137 @@
+-- Crear tabla Ubigeo
+CREATE TABLE Ubigeo (
+    ID_Ubigeo_INT INT PRIMARY KEY,
+    Ubigeo_Codigo VARCHAR(10),
+    Ubigeo_Departamento VARCHAR(50),
+    Ubigeo_Provincia VARCHAR(50),
+    Ubigeo_Distrito VARCHAR(50)
+);
+
+-- Crear tabla Agencia
+CREATE TABLE Agencia (
+    ID_Agencia_INT INT PRIMARY KEY,
+    Nombre VARCHAR(100),
+    ID_Ubigeo INT,
+    IsActive BIT,
+    FOREIGN KEY (ID_Ubigeo) REFERENCES Ubigeo(ID_Ubigeo_INT)
+);
+
+-- Crear tabla Empleados
+CREATE TABLE Empleados (
+    ID_Empleado_INT INT PRIMARY KEY,
+    Nombre VARCHAR(50),
+    Apellido VARCHAR(50),
+    DNI VARCHAR(8),
+    Telefono VARCHAR(15)
+);
+
+-- Crear tabla Pasajero
+CREATE TABLE Pasajero (
+    ID_Pasajero_INT INT PRIMARY KEY,
+    Nombre VARCHAR(50),
+    DNI VARCHAR(8),
+    Email VARCHAR(100),
+    Telefono VARCHAR(15)
+);
+
+-- Crear tabla Categoria
+CREATE TABLE Categoria (
+    ID_Categoria_INT INT PRIMARY KEY,
+    Nombre VARCHAR(50),
+    Descripcion VARCHAR(255),
+    Costo_extra DECIMAL,
+    IsActive BIT
+);
+
+-- Crear tabla Buses
+CREATE TABLE Buses (
+    ID_Bus_INT INT PRIMARY KEY,
+    Placa CHAR(7),
+    Modelo VARCHAR(50),
+    Capacidad INT,
+    ID_Categoria INT,
+    IsActive BIT,
+    FOREIGN KEY (ID_Categoria) REFERENCES Categoria(ID_Categoria_INT)
+);
+
+-- Crear tabla Choferes
+CREATE TABLE Choferes (
+    ID_Chofer_INT INT PRIMARY KEY,
+    Nombre VARCHAR(50),
+    DNI VARCHAR(8),
+    Nro_Licencia VARCHAR(20),
+    Telefono VARCHAR(15),
+    Email VARCHAR(100),
+    ID_Bus INT,
+    IsActive BIT,
+    FOREIGN KEY (ID_Bus) REFERENCES Buses(ID_Bus_INT)
+);
+
+-- Crear tabla Viaje
+CREATE TABLE Viaje (
+    ID_Viaje_INT INT PRIMARY KEY,
+    ID_Agencia_Origen_INT INT,
+    ID_Agencia_Destino_INT INT,
+    FechaHoraSalida DATETIME,
+    IsActive BIT,
+    FOREIGN KEY (ID_Agencia_Origen_INT) REFERENCES Agencia(ID_Agencia_INT),
+    FOREIGN KEY (ID_Agencia_Destino_INT) REFERENCES Agencia(ID_Agencia_INT)
+);
+
+-- Crear tabla Viaje_Bus
+CREATE TABLE Viaje_Bus (
+    ID_Viaje_Bus_INT INT PRIMARY KEY,
+    ID_Viaje INT,
+    ID_Bus INT,
+    FOREIGN KEY (ID_Viaje) REFERENCES Viaje(ID_Viaje_INT),
+    FOREIGN KEY (ID_Bus) REFERENCES Buses(ID_Bus_INT)
+);
+
+-- Crear tabla Asiento
+CREATE TABLE Asiento (
+    ID_Asiento_INT INT PRIMARY KEY,
+    ID_Bus INT,
+    Numero CHAR(3),
+    Estado VARCHAR(20),
+    FOREIGN KEY (ID_Bus) REFERENCES Buses(ID_Bus_INT)
+);
+
+-- Crear tabla Compra
+CREATE TABLE Compra (
+    ID_Compra_INT INT PRIMARY KEY,
+    ID_Pasajero INT,
+    ID_Empleado INT,
+    FOREIGN KEY (ID_Pasajero) REFERENCES Pasajero(ID_Pasajero_INT),
+    FOREIGN KEY (ID_Empleado) REFERENCES Empleados(ID_Empleado_INT)
+);
+
+-- Crear tabla Boleto
+CREATE TABLE Boleto (
+    ID_Boleto_INT INT PRIMARY KEY,
+    ID_Viaje INT,
+    ID_Asiento INT,
+    FechaHoraCompra DATETIME,
+    Precio DECIMAL,
+    FOREIGN KEY (ID_Viaje) REFERENCES Viaje(ID_Viaje_INT),
+    FOREIGN KEY (ID_Asiento) REFERENCES Asiento(ID_Asiento_INT)
+);
+
+-- Crear tabla Detalle_Compra
+CREATE TABLE Detalle_Compra (
+    ID_Detalle_INT INT PRIMARY KEY,
+    ID_Compra INT,
+    ID_Boleto INT,
+    FechaHoraCompra DATETIME,
+    Precio DECIMAL,
+    PrecioTotal DECIMAL,
+    FOREIGN KEY (ID_Compra) REFERENCES Compra(ID_Compra_INT),
+    FOREIGN KEY (ID_Boleto) REFERENCES Boleto(ID_Boleto_INT)
+);
+
+-- Crear tabla Comprobante_Pago
+CREATE TABLE Comprobante_Pago (
+    ID_Documento_INT INT PRIMARY KEY,
+    ID_Detalle INT,
+    FechaEmision DATETIME,
+    FOREIGN KEY (ID_Detalle) REFERENCES Detalle_Compra(ID_Detalle_INT)
+);
